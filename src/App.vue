@@ -74,6 +74,22 @@
           </el-card>
 
           <el-card shadow="never">
+            <template #header>⏱️ 服务器时间流速控制</template>
+            <el-form label-width="70px" label-position="left" size="default">
+              <el-form-item label="全局倍率">
+                <el-slider 
+                  v-model="timeScale" 
+                  :min="1" 
+                  :max="10" 
+                  :step="0.1" 
+                  show-input>
+                </el-slider>
+              </el-form-item>
+              <el-button type="warning" style="width:100%; margin-top: 10px;" @click="setTimeScale">应用流速设置</el-button>
+            </el-form>
+          </el-card>
+
+          <el-card shadow="never">
             <template #header>⚙️ 场景监控设置</template>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
               <span style="font-size: 14px; color: #E6A23C;">📡 实时数据同步</span>
@@ -169,6 +185,9 @@ const form = ref({ sceneId: '101', bossId: 103, x: 0, z: 0 });
 // 掉落表单状态
 const dropForm = ref({ itemId: null, x: 0, z: 0 });
 const dropItemList = ref([]);
+
+// 时间加速状态
+const timeScale = ref(1.0);
 
 // 地图与数据状态
 const mapRef = ref(null);
@@ -370,6 +389,19 @@ const fetchSceneData = async () => {
     if (res.data.entities) entities.value = res.data.entities;
   } catch (err) {
     // 忽略轮询网络错误
+  }
+};
+
+const setTimeScale = async () => {
+  try {
+    addLog(`正在将全局服务器时间流速设置为: ${timeScale.value}x ...`);
+    await axios.post('http://localhost:3000/api/gm/set_time_scale', { 
+      scale: timeScale.value 
+    });
+    addLog(`✅ 全局时间流速 (${timeScale.value}x) 设置成功！`);
+  } catch (err) {
+    const msg = err.response?.data?.message || err.message;
+    addLog(`❌ 设置时间流速失败: ${msg}`, true);
   }
 };
 
