@@ -567,7 +567,8 @@ const handleLogin = async () => {
 };
 
 const handleLogout = () => {
-  polling.value = false;
+  if (timer) { clearInterval(timer); timer = null; }
+  if (roomListTimer) { clearInterval(roomListTimer); roomListTimer = null; }
   addLog(`退出登录`);
   setTimeout(() => {
     localStorage.removeItem('gm_token');
@@ -576,6 +577,7 @@ const handleLogout = () => {
     isLoggedIn.value = false;
     currentUser.value = '';
     history.value = [];
+    selectedRoom.value = null;
   }, 100);
 };
 
