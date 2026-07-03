@@ -316,6 +316,13 @@ const fetchRoomList = async () => {
     const res = await axios.get('http://localhost:3000/api/gm/rooms');
     if (res.data && res.data.data) {
       roomList.value = res.data.data;
+      if (selectedRoom.value) {
+        const stillExists = roomList.value.some(r => r.roomId === selectedRoom.value.roomId);
+        if (!stillExists) {
+          addLog(`房间 ${selectedRoom.value.roomId} 已被销毁`, true);
+          selectedRoom.value = null;
+        }
+      }
     }
   } catch (err) {
     console.error('获取房间列表失败', err);
